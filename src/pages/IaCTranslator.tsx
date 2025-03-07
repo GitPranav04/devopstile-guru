@@ -21,7 +21,8 @@ const IaCTranslator = () => {
     // In a real implementation, this would call an API
     // For demo purposes, we'll simulate a translation
     setTimeout(() => {
-      const simpleTranslations: {[key: string]: string} = {
+      // Restructured the simpleTranslations object to fix type errors
+      const simpleTranslations: {[key: string]: {[key: string]: string}} = {
         terraform: {
           cloudformation: `{
   "AWSTemplateFormatVersion": "2010-09-09",
