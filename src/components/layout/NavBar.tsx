@@ -25,7 +25,7 @@ const NavBar: React.FC = () => {
           <li>
             <Link 
               to="/devops-assistant" 
-              className={`text-white/80 hover:text-white transition-all ${location.pathname === '/devops-assistant' ? 'text-white' : ''}`}
+              className="text-white hover:text-white/80 transition-all"
             >
               DevOps Assistant
             </Link>
@@ -33,7 +33,7 @@ const NavBar: React.FC = () => {
           <li>
             <Link 
               to="/iac-translator" 
-              className={`text-white/80 hover:text-white transition-all ${location.pathname === '/iac-translator' ? 'text-white' : ''}`}
+              className="text-white hover:text-white/80 transition-all"
             >
               IaC Translator
             </Link>

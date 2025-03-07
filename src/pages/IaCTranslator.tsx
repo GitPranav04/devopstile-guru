@@ -43,7 +43,50 @@ const instance = new aws.ec2.Instance("myInstance", {
     ami: "ami-0c55b159cbfafe1f0"
 });
 
-export const instanceId = instance.id;`
+export const instanceId = instance.id;`,
+          azure: `{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-03-01",
+      "name": "myVM",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_D2s_v3"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "18.04-LTS",
+            "version": "latest"
+          }
+        }
+      }
+    }
+  ]
+}`,
+          gcp: `resource "google_compute_instance" "default" {
+  name         = "test-instance"
+  machine_type = "e2-medium"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {
+      // Ephemeral public IP
+    }
+  }
+}`
         },
         cloudformation: {
           terraform: `provider "aws" {
@@ -53,6 +96,28 @@ export const instanceId = instance.id;`
 resource "aws_instance" "example" {
   ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
+}`,
+          azure: `{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-03-01",
+      "name": "convertedVM",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_D2s_v3"
+        }
+      }
+    }
+  ]
+}`,
+          gcp: `resource "google_compute_instance" "converted" {
+  name         = "converted-instance"
+  machine_type = "e2-medium"
+  zone         = "us-central1-a"
 }`
         },
         pulumi: {
@@ -63,6 +128,99 @@ resource "aws_instance" "example" {
 resource "aws_instance" "example" {
   ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
+}`,
+          azure: `{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-03-01",
+      "name": "pulumiVM",
+      "location": "[resourceGroup().location]"
+    }
+  ]
+}`,
+          gcp: `resource "google_compute_instance" "pulumi_converted" {
+  name         = "pulumi-instance"
+  machine_type = "e2-medium"
+  zone         = "us-central1-a"
+}`
+        },
+        azure: {
+          terraform: `provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_virtual_machine" "example" {
+  name                  = "example-vm"
+  location              = "East US"
+  resource_group_name   = "example-resources"
+  vm_size               = "Standard_D2s_v3"
+}`,
+          cloudformation: `{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "ConvertedAzureVM": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "InstanceType": "t2.medium",
+        "ImageId": "ami-0c55b159cbfafe1f0"
+      }
+    }
+  }
+}`,
+          gcp: `resource "google_compute_instance" "azure_converted" {
+  name         = "azure-instance"
+  machine_type = "e2-medium"
+  zone         = "us-central1-a"
+}`
+        },
+        gcp: {
+          terraform: `provider "google" {
+  project = "my-project-id"
+  region  = "us-central1"
+}
+
+resource "google_compute_instance" "example" {
+  name         = "example-instance"
+  machine_type = "e2-medium"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+    }
+  }
+}`,
+          cloudformation: `{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "ConvertedGCPInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "InstanceType": "t2.medium",
+        "ImageId": "ami-0c55b159cbfafe1f0"
+      }
+    }
+  }
+}`,
+          azure: `{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-03-01",
+      "name": "gcpVM",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_D2s_v3"
+        }
+      }
+    }
+  ]
 }`
         }
       };
@@ -86,15 +244,15 @@ resource "aws_instance" "example" {
     },
     {
       question: "What IaC formats does the translator support?",
-      answer: "Our translator currently supports Terraform, AWS CloudFormation, and Pulumi. More formats will be added in future updates."
+      answer: "Our translator currently supports Terraform, AWS CloudFormation, Pulumi, Azure ARM templates, and Google Cloud Deployment Manager. More formats will be added in future updates."
     },
     {
       question: "Is this translation 100% accurate?",
       answer: "While our translator handles most common patterns, complex configurations may require manual adjustment. We recommend reviewing the translated code before deployment."
     },
     {
-      question: "Can I translate Azure ARM templates?",
-      answer: "Azure ARM template support is coming soon. Currently, we focus on AWS-related infrastructure code formats."
+      question: "Can I translate between different cloud providers?",
+      answer: "Yes, our translator supports cross-cloud translation between AWS, Azure, and GCP infrastructure formats, helping you migrate workloads between cloud providers."
     }
   ];
 
@@ -116,64 +274,72 @@ resource "aws_instance" "example" {
               </TabsList>
               
               <TabsContent value="translator" className="space-y-6">
-                <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
-                  <div className="w-full md:w-1/3 space-y-2">
-                    <label className="text-theme-dark font-medium">Source Format</label>
-                    <Select value={sourceFormat} onValueChange={setSourceFormat}>
-                      <SelectTrigger className="bg-white/70 text-theme-dark">
-                        <SelectValue placeholder="Select source format" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="terraform">Terraform</SelectItem>
-                        <SelectItem value="cloudformation">CloudFormation</SelectItem>
-                        <SelectItem value="pulumi">Pulumi</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-theme-dark font-medium">Source Format</label>
+                      <Select value={sourceFormat} onValueChange={setSourceFormat}>
+                        <SelectTrigger className="bg-white/70 text-theme-dark">
+                          <SelectValue placeholder="Select source format" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="terraform">Terraform</SelectItem>
+                          <SelectItem value="cloudformation">AWS CloudFormation</SelectItem>
+                          <SelectItem value="pulumi">Pulumi</SelectItem>
+                          <SelectItem value="azure">Azure ARM</SelectItem>
+                          <SelectItem value="gcp">Google Cloud</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-theme-dark font-medium">Source Code</label>
+                      <Textarea 
+                        value={sourceCode}
+                        onChange={(e) => setSourceCode(e.target.value)}
+                        placeholder={`Enter your ${sourceFormat} code here...`}
+                        className="min-h-[300px] font-mono text-sm bg-white/70 text-theme-dark"
+                      />
+                    </div>
                   </div>
                   
-                  <div className="w-full md:w-1/3 space-y-2">
-                    <label className="text-theme-dark font-medium">Target Format</label>
-                    <Select value={targetFormat} onValueChange={setTargetFormat}>
-                      <SelectTrigger className="bg-white/70 text-theme-dark">
-                        <SelectValue placeholder="Select target format" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="terraform">Terraform</SelectItem>
-                        <SelectItem value="cloudformation">CloudFormation</SelectItem>
-                        <SelectItem value="pulumi">Pulumi</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-theme-dark font-medium">Target Format</label>
+                      <Select value={targetFormat} onValueChange={setTargetFormat}>
+                        <SelectTrigger className="bg-white/70 text-theme-dark">
+                          <SelectValue placeholder="Select target format" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="terraform">Terraform</SelectItem>
+                          <SelectItem value="cloudformation">AWS CloudFormation</SelectItem>
+                          <SelectItem value="pulumi">Pulumi</SelectItem>
+                          <SelectItem value="azure">Azure ARM</SelectItem>
+                          <SelectItem value="gcp">Google Cloud</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-theme-dark font-medium">Target Code</label>
+                      <Textarea 
+                        value={targetCode}
+                        readOnly
+                        placeholder={`Translated ${targetFormat} will appear here...`}
+                        className="min-h-[300px] font-mono text-sm bg-white/70 text-theme-dark"
+                      />
+                    </div>
                   </div>
-                  
+                </div>
+                
+                <div className="flex justify-center mt-4">
                   <Button 
                     onClick={handleTranslate} 
                     disabled={isTranslating}
-                    className="bg-theme-dark hover:bg-theme-dark/80 text-white px-6"
+                    className="bg-theme-dark hover:bg-theme-dark/80 text-white px-8"
                   >
                     {isTranslating ? "Translating..." : "Translate"}
                   </Button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-theme-dark font-medium">Source Code</label>
-                    <Textarea 
-                      value={sourceCode}
-                      onChange={(e) => setSourceCode(e.target.value)}
-                      placeholder={`Enter your ${sourceFormat} code here...`}
-                      className="min-h-[300px] font-mono text-sm bg-white/70 text-theme-dark"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-theme-dark font-medium">Target Code</label>
-                    <Textarea 
-                      value={targetCode}
-                      readOnly
-                      placeholder={`Translated ${targetFormat} will appear here...`}
-                      className="min-h-[300px] font-mono text-sm bg-white/70 text-theme-dark"
-                    />
-                  </div>
                 </div>
               </TabsContent>
               
