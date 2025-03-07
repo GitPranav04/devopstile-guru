@@ -9,7 +9,7 @@ const NavBar: React.FC = () => {
     <header className="w-full py-4 px-6 flex justify-between items-center bg-theme-dark/80 backdrop-blur-md border-b border-white/10 animate-fade-in">
       <div className="flex items-center">
         <Link to="/" className="text-white font-medium text-xl transition-all hover:opacity-80">
-          DevOpsTile
+          CloudMorph
         </Link>
       </div>
       <nav>
