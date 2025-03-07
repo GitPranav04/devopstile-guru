@@ -122,8 +122,9 @@
     to { opacity: 1; }
   }
 
+  /* Modified to fix disappearing UI issue */
   .page-transition {
-    @apply opacity-0 animate-fade-up;
+    @apply opacity-100 animate-fade-in;
   }
 
   /* ChatGPT-like styles */
