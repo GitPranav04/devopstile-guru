@@ -17,7 +17,7 @@ const NavBar: React.FC = () => {
           <li>
             <Link 
               to="/" 
-              className={`text-white/80 hover:text-white transition-all ${location.pathname === '/' ? 'text-white' : ''}`}
+              className={`text-white hover:text-white/80 transition-all ${location.pathname === '/' ? 'text-white font-medium' : 'text-white/90'}`}
             >
               Home
             </Link>
@@ -25,7 +25,7 @@ const NavBar: React.FC = () => {
           <li>
             <Link 
               to="/devops-assistant" 
-              className="text-white hover:text-white/80 transition-all"
+              className={`text-white hover:text-white/80 transition-all ${location.pathname === '/devops-assistant' ? 'text-white font-medium' : 'text-white/90'}`}
             >
               DevOps Assistant
             </Link>
@@ -33,7 +33,7 @@ const NavBar: React.FC = () => {
           <li>
             <Link 
               to="/iac-translator" 
-              className="text-white hover:text-white/80 transition-all"
+              className={`text-white hover:text-white/80 transition-all ${location.pathname === '/iac-translator' ? 'text-white font-medium' : 'text-white/90'}`}
             >
               IaC Translator
             </Link>
